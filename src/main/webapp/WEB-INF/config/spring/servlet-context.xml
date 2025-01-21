@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/mvc
+		 				   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+		 				   
+	<!-- 어노테이션 service, controller 스캔 시작 -->
+    <context:component-scan base-package="com.sist.web.controller" />
+    <!-- 어노테이션 service, controller 스캔 종료 -->
+    
+    <mvc:annotation-driven>
+   		<mvc:message-converters>
+      		<bean class="org.springframework.http.converter.json.GsonHttpMessageConverter">
+    			<property name="gson">
+                	<bean class="org.springframework.http.converter.json.GsonFactoryBean">
+                		<property name="serializeNulls" value="true" />
+                		<property name="prettyPrinting" value="true" />
+                	</bean>
+            	</property>
+      		</bean>
+      	</mvc:message-converters>
+    </mvc:annotation-driven>
+    
+    <!-- url 매핑 시작 (이미지, 자바스트립트, 스타일시트 디렉토리)-->
+    <mvc:resources mapping="/resources/**" location="/WEB-INF/views/resources/" />
+    <!-- url 매핑 종료 -->
+    
+	<!-- Interceptors 시작 -->
+    <mvc:interceptors>
+    	<!-- 브라우저 캐쉬 설정 시작 -->
+        <mvc:interceptor>
+        	<mvc:mapping path="/**" />
+            <bean id="webContentInterceptor" class="org.springframework.web.servlet.mvc.WebContentInterceptor">
+		        <property name="cacheSeconds" value="0" />
+		    </bean>    
+        </mvc:interceptor>
+        <!-- 브라우저 캐쉬 설정 종료 -->
+        
+        <!-- 로그인 체크 인터셉터 시작 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/resources/**" />
+            <bean id="authInterceptor" class="com.sist.web.interceptor.AuthInterceptor">
+            	<constructor-arg>
+            		<value>#{env['auth.cookie.name']}</value>
+            	</constructor-arg>
+            	<constructor-arg>
+            		<value>#{env['ajax.header.name']}</value>
+            	</constructor-arg>
+            	<constructor-arg> <!-- 인증체크 제외 URL 설정 -->
+            		<list>
+            			<value>/index</value>
+            			<value>/first</value>
+            			<value>/user/login</value>
+            			<value>/user/loginOut</value>
+            			<value>/user/regForm</value>
+            			<value>/user/regProc</value>
+            			<value>/user/idCheck</value>
+            			<value>/user/userForm</value>
+            			<value>/user/findForm</value>
+            			<value>/sendMail</value>
+            		</list>
+            	</constructor-arg>
+            </bean>
+        </mvc:interceptor>
+        <!-- 로그인 체크 인터셉터 종료 -->
+    </mvc:interceptors>
+    <!-- Interceptors 종료 -->
+    
+    <!-- ############################### View Resolver 시작 ############################### -->
+    <!-- 사용자가 요청한 것에 대한 응답 view를 렌더링하는 역할 -->
+    <bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+    	<property name="order" value="0"/> <!-- 순서 (순서가 작은것 부터 처리된다) -->
+    </bean>
+    
+    <!-- View Resolver 시작 -->
+	<!-- 컨트롤러에서 리턴하는 뷰 이름에 접두사, 접미사를 붙여서 JSP페이지의 경로를 찾는다. -->
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> <!-- JSTL 사용 -->
+        <property name="prefix" value="/WEB-INF/views" /> <!-- 접두사 -->
+        <property name="suffix" value=".jsp" />           <!-- 접미사 -->
+        <property name="order" value="1" />               <!-- 순서 -->
+    </bean>
+    <!-- View Resolver 종료 -->
+    <!-- ############################### View Resolver 종료 ############################### -->
+    
+    <!-- 파일 다운로드 VIWE 시작 -->
+    <bean id="fileDownloadView" class="com.sist.web.view.FileDownloadView"/>
+	<!-- 파일 다운로드 VIWE 종료 -->
+    
+    <!-- 파일 업로드 설정 시작 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="maxUploadSize" value="#{env['upload.max.size']}" /><!-- 파일 업로드 용량제한 (바이트단위) -->
+	</bean>
+	<!-- 파일 업로드 설정 종료 -->
+	 	
+</beans>

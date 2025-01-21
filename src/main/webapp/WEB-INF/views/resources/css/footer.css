@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+footer {
+	background-color: #333;
+	color: #8a8a8a;
+	padding: 20px;
+	text-align: center;
+}
+
+footer img {
+	width: 40px;
+	margin: 20px 0 20px 0;
+	opacity: 20%;
+}
+
+footer p {
+	font-size: 12px;
+}
+
+footer .lastp {
+	margin-top: 20px;
+}

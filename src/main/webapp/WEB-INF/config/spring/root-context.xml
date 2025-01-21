@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                       http://www.springframework.org/schema/beans/spring-beans.xsd
+	                       http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+	                       http://www.springframework.org/schema/util
+       					   http://www.springframework.org/schema/util/spring-util.xsd
+       					   http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- 환경변수 시작 -->
+	<util:properties id="env" location="/WEB-INF/config/env.xml" />
+	<!-- 환경변수 종료 -->
+	
+	<!-- HikariCP configuration 시작 -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig"> 
+		<property name="poolName" value="#{env['db.pool.name']}" /> 
+		<property name="driverClassName" value="#{env['db.driver.class.name']}" /> 
+		<property name="jdbcUrl" value="#{env['db.jdbc.url']}" /> 
+		<property name="username" value="#{env['db.username']}" /> 
+		<property name="password" value="#{env['db.password']}" /> 
+		<property name="maximumPoolSize" value="#{env['db.maximum.pool.size']}" />
+		<property name="minimumIdle" value="#{env['db.minimum.idle']}" />
+		<property name="connectionTestQuery" value="#{env['db.connection.test.query']}" />
+		<property name="connectionTimeout" value="#{env['db.connection.timeout']}" />
+		<property name="idleTimeout" value="#{env['db.idle.timeout']}" />
+	</bean>
+	<!-- HikariCP configuration 종료 -->
+
+	<!-- dataSource 생성 시작 -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+	    <constructor-arg ref="hikariConfig" />
+	</bean>
+	<!-- dataSource 생성 종료 -->
+	
+	<!-- SqlSessionFactoryBean 생성 시작(앞서 정의했던 DataSource 를 매핑) -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+       <property name="configLocation" value="/WEB-INF/config/mybatis/mybatis-config.xml" />
+       <property name="dataSource" ref="dataSource" />
+       <property name="mapperLocations" value="classpath*:com/sist/web/mapper/**/*.xml" />
+    </bean>
+    <!-- SqlSessionFactoryBean 생성 종료 -->
+    
+    <!-- SqlSessionTemplate 생성 시작(bean과 연결, dao와 공유) -->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+    <!-- SqlSessionTemplate 생성 종료 -->
+    
+    <!-- 어노테이션 mybatis dao 스캔 시작 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.sist.web.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+    <!-- 어노테이션 mybatis dao 스캔 종료 -->
+    
+    <!-- 트랜잭션 메니져 설정 시작 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!-- 트랜잭션 메니져 설정 종료 -->
+
+    <!-- 어노테이션 트랜잭션 사용 시작 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!-- 어노테이션 트랜잭션 사용 종료 -->
+	
+	<context:component-scan base-package="com.sist.web.service" />
+	
+	
+	
+	<!-- 메일 서버 관련 정보 설정 -->
+   	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"> 
+     	<property name="host" value="smtp.gmail.com" />
+     	<!-- google SMTP 메일 서버 포트 -->
+     	<property name="port" value="587" /> 
+     	
+     	<!-- 자신의 메일, 비밀번호 설정 -->
+ 		<property name="username" value="kdf3619@gmail.com"/> 
+ 		<!-- Google의 경우 계정 비밀번호가 아니라 2단계 인증을 거친 후 얻게 되는 16자리 비밀번호로 설정해야 한다-->
+ 		<property name="password" value="yllqnekvmoxppijj"/> 
+ 		
+ 		<!-- 메일 전달 프로토콜 세부 속성 설정 -->
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+				<prop key="mail.debug">true</prop>
+			</props>
+		</property>
+	</bean>
+		
+</beans>

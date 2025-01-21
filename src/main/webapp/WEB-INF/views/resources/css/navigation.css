@@ -1,0 +1,101 @@
+@charset "UTF-8";
+
+dl, ol, ul {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+p {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	color: #333;
+}
+
+header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20px 100px;
+	background-color: #333;
+}
+
+header .header-content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	padding-top: 6px;
+}
+
+header .logo {
+	margin-right: auto;
+}
+
+header .logo img {
+	width: 100px;
+}
+
+header nav {
+	margin-left: auto;
+	position: relative; /* To position dropdown */
+}
+
+header nav ul {
+	display: flex;
+	list-style: none;
+}
+
+header nav ul li {
+	margin-left: 20px;
+	margin-bottom: 0px;
+	position: relative;
+}
+
+header nav ul li a {
+	color: white;
+	text-decoration: none;
+}
+
+header nav ul li a img {
+	width: 30px;
+	margin-bottom: 2px;
+}
+
+/* 드롭다운 메뉴 숨기기 */
+.dropdown-menu {
+	display: none;
+	position: absolute;
+	top: 60px; /* 네비게이션 아래에 위치 */
+	background-color: #333;
+	border-radius: 8px;
+	padding: 10px 0;
+	box-shadow: 0px 4px 8px rgba(0, 0, 0.5, 0.8);
+	list-style: none;
+	min-width: 150px; /* 드롭다운 메뉴 최소 너비 */
+	transform: translateX(-77%); /* 햄버거 버튼의 오른쪽 끝과 메뉴의 오른쪽 끝을 맞춤 */
+	z-index: 7;
+}
+
+.dropdown-menu li {
+	margin: 0;
+}
+
+.dropdown-menu li a {
+	color: white;
+	padding: 10px 20px;
+	display: block;
+	text-decoration: none;
+}
+
+.dropdown-menu li a:hover {
+	background-color: #555;
+}
+
+/* 햄버거 버튼 위치 */
+.nav-item-dropdown {
+	position: relative;
+}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sist.web.dao.UserDao">
+  
+  	<resultMap type="com.sist.web.model.User" id="userResultMap">
+		
+		<id column="USER_ID" property="userId" />
+		<result column="USER_PWD" property="userPwd" />
+		<result column="USER_NAME" property="userName" />
+		<result column="USER_EMAIL" property="userEmail" />
+		<result column="STATUS" property="status" />
+		<result column="REG_DATE" property="regDate" />
+		<result column="ADDR_CODE" property="addrCode" />
+		<result column="ADDR_BASE" property="addrBase" />
+		<result column="ADDR_DETAIL" property="addrDetail" />
+		<result column="RATING" property="rating" />
+
+	</resultMap>
+	
+	<select id="userSelect" parameterType="String" resultMap="userResultMap">
+		SELECT USER_ID,
+		       NVL(USER_PWD, '') USER_PWD,
+		       NVL(USER_NAME, '') USER_NAME,
+		       NVL(USER_EMAIL, '') USER_EMAIL,
+		       NVL(STATUS, 'N') STATUS,
+		       NVL(TO_CHAR(REG_DATE, 'YYYY.MM.DD HH24:MI:SS'), '') REG_DATE,
+		       NVL(ADDR_CODE, '') ADDR_CODE,
+		       NVL(ADDR_BASE, '') ADDR_BASE,
+		       NVL(ADDR_DETAIL, '') ADDR_DETAIL,
+		       NVL(RATING, '') RATING
+		  FROM SPR_USER
+		 WHERE USER_ID = #{value}
+	</select>
+	
+	<insert id="userInsert" parameterType="com.sist.web.model.User">
+		INSERT INTO SPR_USER (
+		    USER_ID,
+		    USER_PWD,
+		    USER_NAME,
+		    USER_EMAIL,
+		    STATUS,
+		    REG_DATE,
+		    ADDR_CODE,
+		    ADDR_BASE,
+		    ADDR_DETAIL,
+		    RATING
+		) VALUES (
+		    #{userId},
+		    #{userPwd},
+		    #{userName},
+		    #{userEmail},
+		    #{status},
+		    SYSDATE,
+		    #{addrCode},
+		    #{addrBase},
+		    #{addrDetail},
+		    #{rating}
+		)
+	</insert>
+	
+	<update id="userUpdate" parameterType="com.sist.web.model.User">
+		UPDATE SPR_USER
+		   SET USER_NAME = #{userName},
+		       USER_EMAIL = #{userEmail},
+		       ADDR_CODE = #{addrCode},
+		       ADDR_BASE = #{addrBase},
+		       ADDR_DETAIL = #{addrDetail}
+		 WHERE USER_ID = #{userId}
+	</update>
+	<update id="userPasswordUpdate" parameterType="com.sist.web.model.User">
+		UPDATE SPR_USER
+		   SET USER_PWD = #{userPwd}
+		 WHERE USER_ID = #{userId}
+	</update>
+	
+	<select id="userFindId" parameterType="String" resultMap="userResultMap">
+		SELECT USER_ID,
+		       USER_NAME,
+		       USER_EMAIL
+		  FROM SPR_USER
+		 WHERE USER_NAME = #{userName}
+		   AND USER_EMAIL = #{userEmail}
+	</select>
+	
+	<select id="userFindPwd" parameterType="String" resultMap="userResultMap">
+		SELECT USER_PWD,
+			   USER_ID,
+			   USER_NAME,
+			   USER_EMAIL
+		  FROM SPR_USER
+		 WHERE USER_ID = #{userId}
+		   AND USER_NAME = #{userName}
+		   AND USER_EMAIL = #{userEmail}
+	</select>
+	
+	<update id="userDelete" parameterType="com.sist.web.model.User">
+		UPDATE SPR_USER
+		   SET STATUS = 'D'
+		 WHERE USER_ID = #{userId}
+	</update>
+	
+  
+</mapper>
